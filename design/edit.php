@@ -1,5 +1,11 @@
 <?php
 
+
+
+
+
+
+
 // 友達の名前を取得し表示
     $dsn = 'mysql:dbname=myfriends;host=localhost';
      $user = 'root';

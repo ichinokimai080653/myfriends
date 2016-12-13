@@ -1,3 +1,74 @@
+<?php
+
+// 友達の名前を取得し表示
+    $dsn = 'mysql:dbname=myfriends;host=localhost';
+     $user = 'root';
+     $password = '';
+     $dbh = new PDO($dsn, $user, $password);
+     $dbh->query('SET NAMES utf8');
+
+     // SQL作成
+     $sql = 'SELECT * FROM `areas` ';
+
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+
+    
+    
+
+
+
+ //データの取得(友達情報)
+    $areas = array();
+
+  
+  while (1) {
+    // データの取得
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // データが取得できなくなったら繰り返しの処理を終了
+    if ($rec == false){
+      break;
+     }
+
+
+    $areas[] = $rec;
+  }
+
+
+     // パラメータを受け取る
+     $friend_id = $_GET['friend_id'];
+
+    //sql文を作成 
+     $sql = 'SELECT * FROM `friends` WHERE `friend_id`='.$friend_id;
+
+     // ｓｑｌを実行
+    $stmt = $dbh->prepare($sql);
+     $stmt->execute();
+
+     // 友達のデータ取得
+     $friends = $stmt->fetch(PDO::FETCH_ASSOC);
+
+     //データの更新処理
+     if (isset($_POST) && !empty($_POST)){
+      
+      $sql = 'UPDATE `friends` SET `friend_name`="'.$_POST['name'].'",`area_id`='.$_POST['area_id'].',`gender`='.$_POST['gender'].',`age`='.$_POST['age'].' WHERE `friend_id` = '.$friend_id;
+  
+    // SQLを実行
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+  
+    //更新処理完了後、index.phpへ遷移
+    header('Location: index.php');
+   }
+ 
+   // DB切断
+   $dbh = null;
+  
+
+  
+
+?>
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -53,7 +124,7 @@
             <div class="form-group">
               <label class="col-sm-2 control-label">名前</label>
               <div class="col-sm-10">
-                <input type="text" name="name" class="form-control" placeholder="山田　太郎" value="山田　太郎">
+                <input type="text" name="name" class="form-control" placeholder="山田　太郎" value="<?php echo $friends['friend_name']; ?>">
               </div>
             </div>
             <!-- 出身 -->
@@ -62,11 +133,18 @@
               <div class="col-sm-10">
                 <select class="form-control" name="area_id">
                   <option value="0">出身地を選択</option>
-                  <option value="1" selected>北海道</option>
+                  <?php foreach ($areas as $area):?>
+                    <?php if ($area['area_id']== $friends['area_id']){ ?>
+                      <option value="<?php echo $area['area_id'];?>" selected><?php echo $area['area_name']; ?></option>
+                      <?php }else{ ?>
+                      <option value="<?php echo $area[$area_id];?>" ><?php echo $area['area_name']; ?></option>
+                      <?php }?>
+                      <?php endforeach; ?>
+                  <!-- <option value="1" selected>北海道</option>
                   <option value="2">青森</option>
                   <option value="3">岩手</option>
                   <option value="4">宮城</option>
-                  <option value="5">秋田</option>
+                  <option value="5">秋田</option> -->
                 </select>
               </div>
             </div>
@@ -76,8 +154,13 @@
               <div class="col-sm-10">
                 <select class="form-control" name="gender">
                   <option value="0">性別を選択</option>
-                  <option value="1" selected>男性</option>
-                  <option value="2">女性</option>
+                  <?php if ($friends['gender'] == 0) { ?>
+                  <option value="0" selected>男性</option>
+                  <option value="1" >女性</option>
+                  <?php } elseif ($friends['gender'] == 0) {?>
+                  <option value="0">男性</option>
+                  <option value="1" selected>女性</option>
+                  <?php } ?>
                 </select>
               </div>
             </div>
@@ -85,7 +168,7 @@
             <div class="form-group">
               <label class="col-sm-2 control-label">年齢</label>
               <div class="col-sm-10">
-                <input type="text" name="age" class="form-control" placeholder="例：27" value="27">
+                <input type="text" name="age" class="form-control" placeholder="例：27" value="<?php echo $friends['age']?>">
               </div>
             </div>
 

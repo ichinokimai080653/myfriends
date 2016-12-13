@@ -1,7 +1,7 @@
 <?php
     $dsn = 'mysql:dbname=myfriends;host=localhost';
    $user = 'root';
-   $password = '';
+   $password = 'mysql';
    $dbh = new PDO($dsn, $user, $password);
    $dbh->query('SET NAMES utf8');
 
